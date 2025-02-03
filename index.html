@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Demo AR Múltiples Marcadores</title>
+
+    <!-- Librerías A-Frame y AR.js -->
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+
+        #ar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #debug-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            max-width: calc(100% - 40px);
+            word-wrap: break-word;
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 20;
+            pointer-events: auto;
+        }
+
+        .ar-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            padding: 10px 15px;
+            margin: 0 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ar-btn:hover {
+            background: rgba(200, 200, 200, 0.9);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Overlay de Realidad Aumentada -->
+    <div id="ar-overlay">
+        <div id="debug-info">Estado: Esperando marcador</div>
+        <div id="controls">
+            <button class="ar-btn" id="debugBtn">Debug</button>
+            <button class="ar-btn" id="resetBtn">Reiniciar</button>
+        </div>
+    </div>
+
+    <!-- Escena A-Frame con AR.js -->
+    <a-scene embedded arjs="sourceType: webcam; 
+               trackingMethod: best; 
+               debugUIEnabled: false; 
+               detectionMode: mono_and_matrix; 
+               matrixCodeType: 3x3;" vr-mode-ui="enabled: false">
+
+        <!-- Marcador Personalizado 1 -->
+        <a-marker type="pattern" url="assets/primero.patt" id="marker-1">
+            <a-entity gltf-model="url(assets/modelo/primero.glb)" scale="0.5 0.5 0.5" position="0 0 0"
+                rotation="0 0 0"></a-entity>
+        </a-marker>
+
+        <!-- Marcador Personalizado 2 -->
+        <a-marker type="pattern" url="assets/segundo.patt" id="marker-2">
+            <a-entity gltf-model="url(assets/modelo/segundo.glb)" scale="0.5 0.5 0.5" position="0 0 0"
+                rotation="0 0 0"></a-entity>
+        </a-marker>
+
+        <!-- Marcador Personalizado 3 -->
+        <a-marker type="pattern" url="assets/tercero.patt" id="marker-3">
+            <a-entity gltf-model="url(assets/modelo/tercero.glb)" scale="0.5 0.5 0.5" position="0 0 0"
+                rotation="0 0 0"></a-entity>
+        </a-marker>
+        
+        <!-- Cámara -->
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+        // Elementos del DOM
+        const debugInfo = document.getElementById('debug-info');
+        const scene = document.querySelector('a-scene');
+        const debugBtn = document.getElementById('debugBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // Marcadores
+        const markers = [
+            document.getElementById('marker-1'),
+            document.getElementById('marker-2'),
+            document.getElementById('marker-3')
+        ];
+
+        // Flag para rastreo de debug
+        let isDebugMode = false;
+
+        // Inicialización de la escena
+        scene.addEventListener('loaded', () => {
+            debugInfo.textContent = 'Cargando AR... Apunta a un marcador';
+        });
+
+        // Eventos de los marcadores
+        markers.forEach((marker, index) => {
+            marker.addEventListener('markerFound', () => {
+                debugInfo.textContent = `Marcador ${index + 1} detectado ✓`;
+                debugInfo.style.backgroundColor = 'rgba(0,255,0,0.5)';
+            });
+
+            marker.addEventListener('markerLost', () => {
+                debugInfo.textContent = `Marcador ${index + 1} perdido. Vuelve a escanear.`;
+                debugInfo.style.backgroundColor = 'rgba(255,0,0,0.5)';
+            });
+        });
+
+        // Funciones de control
+        function toggleDebug() {
+            isDebugMode = !isDebugMode;
+
+            if (isDebugMode) {
+                // Mostrar UI de depuración de AR.js
+                scene.setAttribute('arjs', 'debugUIEnabled: true');
+                debugInfo.textContent = 'Modo Debug Activado';
+                debugBtn.textContent = 'Ocultar Debug';
+            } else {
+                // Ocultar UI de depuración
+                scene.setAttribute('arjs', 'debugUIEnabled: false');
+                debugInfo.textContent = 'Modo Debug Desactivado';
+                debugBtn.textContent = 'Mostrar Debug';
+            }
+        }
+
+        function resetAR() {
+            try {
+                // Intentar reiniciar la detección de marcadores
+                if (scene.components.arjs) {
+                    scene.components.arjs.resetMarkerTracking();
+                }
+
+                // Forzar recarga de la escena
+                scene.reload();
+
+                debugInfo.textContent = 'AR Reiniciado. Apunta a un marcador.';
+                debugInfo.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            } catch (error) {
+                debugInfo.textContent = 'Error al reiniciar: ' + error.message;
+                debugInfo.style.backgroundColor = 'rgba(255,0,0,0.5)';
+            }
+        }
+
+        // Asignar eventos a los botones
+        debugBtn.addEventListener('click', toggleDebug);
+        resetBtn.addEventListener('click', resetAR);
+
+        // Ajustes responsivos
+        window.addEventListener('resize', () => {
+            console.log('Pantalla redimensionada');
+        });
+    </script>
+</body>
+
+</html>

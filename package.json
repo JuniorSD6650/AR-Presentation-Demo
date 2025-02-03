@@ -1,0 +1,19 @@
+{
+  "name": "tema7",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "description": "",
+  "dependencies": {
+    "aframe": "^1.6.0",
+    "aframe-animation-component": "^5.1.2",
+    "ar.js": "^2.2.2",
+    "express": "^4.21.2"
+  }
+}
