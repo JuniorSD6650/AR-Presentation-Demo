@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualización de Imágenes</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
+            font-family: Arial, sans-serif;
+            background-color: black;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        img {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            padding: 5px;
+        }
+        .label {
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Imágenes de Ejemplo</h1>
+
+    <div class="container">
+        <div>
+            <img src="assets/primero.png" alt="Primero" width="200">
+            <p class="label">Primero (200px)</p>
+        </div>
+        <div>
+            <img src="assets/segundo.png" alt="Segundo" width="300">
+            <p class="label">Segundo (300px)</p>
+        </div>
+        <div>
+            <img src="assets/tercero.png" alt="Tercero" width="400">
+            <p class="label">Tercero (400px)</p>
+        </div>
+    </div>
+
+</body>
+</html>
