@@ -90,19 +90,19 @@
 
         <!-- Marcador Personalizado 1 -->
         <a-marker type="pattern" url="assets/primero.patt" id="marker-1">
-            <a-entity gltf-model="url(assets/modelo/primero.glb)" scale="0.5 0.5 0.5" position="0 0 0"
+            <a-entity id="model-1" gltf-model="url(assets/modelo/primero.glb)" scale="0.5 0.5 0.5" position="0 0 0"
                 rotation="0 0 0"></a-entity>
         </a-marker>
 
         <!-- Marcador Personalizado 2 -->
         <a-marker type="pattern" url="assets/segundo.patt" id="marker-2">
-            <a-entity gltf-model="url(assets/modelo/segundo.glb)" scale="0.5 0.5 0.5" position="0 0 0"
+            <a-entity id="model-2" gltf-model="url(assets/modelo/segundo.glb)" scale="0.5 0.5 0.5" position="0 0 0"
                 rotation="0 0 0"></a-entity>
         </a-marker>
 
         <!-- Marcador Personalizado 3 -->
         <a-marker type="pattern" url="assets/tercero.patt" id="marker-3">
-            <a-entity gltf-model="url(assets/modelo/tercero.glb)" scale="0.5 0.5 0.5" position="0 0 0"
+            <a-entity id="model-3" gltf-model="url(assets/modelo/tercero.glb)" scale="0.5 0.5 0.5" position="0 0 0"
                 rotation="0 0 0"></a-entity>
         </a-marker>
 
@@ -123,8 +123,17 @@
             document.getElementById('marker-3')
         ];
 
+        const models = [
+            document.getElementById('model-1'),
+            document.getElementById('model-2'),
+            document.getElementById('model-3')
+        ];
+
         // Flag para rastreo de debug
         let isDebugMode = false;
+
+        // Flag para mantener los modelos visibles
+        const keepModelsVisible = [false, false, false];
 
         // Inicialización de la escena
         scene.addEventListener('loaded', () => {
@@ -136,11 +145,17 @@
             marker.addEventListener('markerFound', () => {
                 debugInfo.textContent = `Marcador ${index + 1} detectado ✓`;
                 debugInfo.style.backgroundColor = 'rgba(0,255,0,0.5)';
+                // Mantener visible el modelo
+                keepModelsVisible[index] = true;
             });
 
             marker.addEventListener('markerLost', () => {
                 debugInfo.textContent = `Marcador ${index + 1} perdido. Vuelve a escanear.`;
                 debugInfo.style.backgroundColor = 'rgba(255,0,0,0.5)';
+                // Mantener visible el modelo aunque se haya perdido el marcador
+                if (!isDebugMode) {
+                    models[index].setAttribute('visible', keepModelsVisible[index]);
+                }
             });
         });
 
