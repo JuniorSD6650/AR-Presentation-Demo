@@ -77,8 +77,7 @@
     <div id="ar-overlay">
         <div id="debug-info">Estado: Esperando marcador</div>
         <div id="controls">
-            <button class="ar-btn" id="debugBtn">Debug</button>
-            <button class="ar-btn" id="resetBtn">Reiniciar</button>
+            <button class="ar-btn" id="debugBtn">Ocultar Debug</button>
         </div>
     </div>
 
@@ -106,7 +105,7 @@
             <a-entity gltf-model="url(assets/modelo/tercero.glb)" scale="0.5 0.5 0.5" position="0 0 0"
                 rotation="0 0 0"></a-entity>
         </a-marker>
-        
+
         <!-- Cámara -->
         <a-entity camera></a-entity>
     </a-scene>
@@ -116,7 +115,6 @@
         const debugInfo = document.getElementById('debug-info');
         const scene = document.querySelector('a-scene');
         const debugBtn = document.getElementById('debugBtn');
-        const resetBtn = document.getElementById('resetBtn');
 
         // Marcadores
         const markers = [
@@ -160,30 +158,14 @@
                 scene.setAttribute('arjs', 'debugUIEnabled: false');
                 debugInfo.textContent = 'Modo Debug Desactivado';
                 debugBtn.textContent = 'Mostrar Debug';
+
+                // Ocultar el texto de depuración
+                debugInfo.style.display = 'none';
             }
         }
 
-        function resetAR() {
-            try {
-                // Intentar reiniciar la detección de marcadores
-                if (scene.components.arjs) {
-                    scene.components.arjs.resetMarkerTracking();
-                }
-
-                // Forzar recarga de la escena
-                scene.reload();
-
-                debugInfo.textContent = 'AR Reiniciado. Apunta a un marcador.';
-                debugInfo.style.backgroundColor = 'rgba(0,0,0,0.5)';
-            } catch (error) {
-                debugInfo.textContent = 'Error al reiniciar: ' + error.message;
-                debugInfo.style.backgroundColor = 'rgba(255,0,0,0.5)';
-            }
-        }
-
-        // Asignar eventos a los botones
+        // Asignar evento al botón de debug
         debugBtn.addEventListener('click', toggleDebug);
-        resetBtn.addEventListener('click', resetAR);
 
         // Ajustes responsivos
         window.addEventListener('resize', () => {
