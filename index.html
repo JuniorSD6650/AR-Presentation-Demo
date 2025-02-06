@@ -4,11 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Demo AR Múltiples Marcadores</title>
+    <title>Demo AR Múltiples Marcadores Animados</title>
 
-    <!-- Librerías A-Frame y AR.js -->
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <script src="https://unpkg.com/aframe-animation-component@3.2.5/dist/aframe-animation-component.min.js"></script>
 
     <style>
         html,
@@ -35,13 +36,14 @@
             position: absolute;
             top: 10px;
             left: 10px;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
             color: white;
             padding: 10px;
             border-radius: 5px;
             font-size: 14px;
             max-width: calc(100% - 40px);
             word-wrap: break-word;
+            z-index: 100;
         }
 
         #controls {
@@ -51,140 +53,183 @@
             width: 100%;
             display: flex;
             justify-content: center;
-            z-index: 20;
+            gap: 20px;
             pointer-events: auto;
+            z-index: 20;
         }
 
         .ar-btn {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             border: none;
-            padding: 10px 15px;
+            padding: 12px 20px;
             margin: 0 10px;
-            border-radius: 5px;
+            border-radius: 25px;
             font-size: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         .ar-btn:hover {
-            background: rgba(200, 200, 200, 0.9);
+            background: rgba(200, 200, 200, 0.95);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 1000;
         }
     </style>
 </head>
 
 <body>
+    <!-- Pantalla de carga -->
+    <div class="loading-screen" id="loadingScreen">
+        <div>Cargando recursos de AR...</div>
+    </div>
+
     <!-- Overlay de Realidad Aumentada -->
     <div id="ar-overlay">
-        <div id="debug-info">Estado: Esperando marcador</div>
+        <div id="debug-info">Estado: Iniciando sistema AR</div>
         <div id="controls">
-            <button class="ar-btn" id="debugBtn">Ocultar Debug</button>
+            <button class="ar-btn" id="playPauseBtn">⏸️ Pause</button>
+            <button class="ar-btn" id="fullscreenBtn">📱 Fullscreen</button>
         </div>
     </div>
 
-    <!-- Escena A-Frame con AR.js -->
+    <!-- Escena A-Frame -->
     <a-scene embedded arjs="sourceType: webcam; 
-               trackingMethod: best; 
-               debugUIEnabled: false; 
-               detectionMode: mono_and_matrix; 
-               matrixCodeType: 3x3;" vr-mode-ui="enabled: false">
+              trackingMethod: best; 
+              debugUIEnabled: false; 
+              detectionMode: mono_and_matrix; 
+              matrixCodeType: 3x3;" vr-mode-ui="enabled: false" renderer="antialias: true; alpha: true"
+        loading-screen="enabled: false">
 
-        <!-- Marcador Personalizado 1 -->
-        <a-marker type="pattern" url="assets/primero.patt" id="marker-1">
-            <a-entity id="model-1" gltf-model="url(assets/modelo/primero.glb)" scale="0.5 0.5 0.5" position="0 0 0"
-                rotation="0 0 0"></a-entity>
+        <!-- Assets preload -->
+        <a-assets>
+            <a-asset-item id="model1" src="assets/modelo/primero.glb"></a-asset-item>
+            <a-asset-item id="model2" src="assets/modelo/segundo.glb"></a-asset-item>
+            <a-asset-item id="model3" src="assets/modelo/tercero.glb"></a-asset-item>
+        </a-assets>
+
+        <!-- Marcadores -->
+        <a-marker type="pattern" url="assets/primero.patt" id="marker-1" smooth="true" smoothCount="5">
+            <a-entity id="model-1" gltf-model="#model1" scale="0.5 0.5 0.5" position="0 0 0" rotation="0 0 0"
+                animation-mixer="clip: *; loop: repeat; timeScale: 1; clampWhenFinished: true"
+                shadow="cast: true; receive: true">
+            </a-entity>
         </a-marker>
 
-        <!-- Marcador Personalizado 2 -->
-        <a-marker type="pattern" url="assets/segundo.patt" id="marker-2">
-            <a-entity id="model-2" gltf-model="url(assets/modelo/segundo.glb)" scale="0.5 0.5 0.5" position="0 0 0"
-                rotation="0 0 0"></a-entity>
+        <a-marker type="pattern" url="assets/segundo.patt" id="marker-2" smooth="true" smoothCount="5">
+            <a-entity id="model-2" gltf-model="#model2" scale="0.5 0.5 0.5" position="0 0 0" rotation="0 0 0"
+                animation-mixer="clip: *; loop: repeat; timeScale: 1; clampWhenFinished: true"
+                shadow="cast: true; receive: true">
+            </a-entity>
         </a-marker>
 
-        <!-- Marcador Personalizado 3 -->
-        <a-marker type="pattern" url="assets/tercero.patt" id="marker-3">
-            <a-entity id="model-3" gltf-model="url(assets/modelo/tercero.glb)" scale="0.5 0.5 0.5" position="0 0 0"
-                rotation="0 0 0"></a-entity>
+        <a-marker type="pattern" url="assets/tercero.patt" id="marker-3" smooth="true" smoothCount="5">
+            <a-entity id="model-3" gltf-model="#model3" scale="0.5 0.5 0.5" position="0 0 0" rotation="0 0 0"
+                animation-mixer="clip: *; loop: repeat; timeScale: 1; clampWhenFinished: true"
+                shadow="cast: true; receive: true">
+            </a-entity>
         </a-marker>
 
-        <!-- Cámara -->
         <a-entity camera></a-entity>
     </a-scene>
 
     <script>
-        // Elementos del DOM
         const debugInfo = document.getElementById('debug-info');
         const scene = document.querySelector('a-scene');
-        const debugBtn = document.getElementById('debugBtn');
+        const loadingScreen = document.getElementById('loadingScreen');
 
-        // Marcadores
-        const markers = [
-            document.getElementById('marker-1'),
-            document.getElementById('marker-2'),
-            document.getElementById('marker-3')
-        ];
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const playPauseBtn = document.getElementById('playPauseBtn');
 
-        const models = [
-            document.getElementById('model-1'),
-            document.getElementById('model-2'),
-            document.getElementById('model-3')
-        ];
+        const markers = Array.from(document.querySelectorAll('a-marker'));
+        const models = Array.from(document.querySelectorAll('[animation-mixer]'));
 
-        // Flag para rastreo de debug
-        let isDebugMode = false;
+        let activeMarkers = new Set();
+        let isPlaying = true;
 
-        // Flag para mantener los modelos visibles
-        const keepModelsVisible = [false, false, false];
-
-        // Inicialización de la escena
-        scene.addEventListener('loaded', () => {
-            debugInfo.textContent = 'Cargando AR... Apunta a un marcador';
-        });
-
-        // Eventos de los marcadores
-        markers.forEach((marker, index) => {
-            marker.addEventListener('markerFound', () => {
-                debugInfo.textContent = `Marcador ${index + 1} detectado ✓`;
-                debugInfo.style.backgroundColor = 'rgba(0,255,0,0.5)';
-                // Mantener visible el modelo
-                keepModelsVisible[index] = true;
-            });
-
-            marker.addEventListener('markerLost', () => {
-                debugInfo.textContent = `Marcador ${index + 1} perdido. Vuelve a escanear.`;
-                debugInfo.style.backgroundColor = 'rgba(255,0,0,0.5)';
-                // Mantener visible el modelo aunque se haya perdido el marcador
-                if (!isDebugMode) {
-                    models[index].setAttribute('visible', keepModelsVisible[index]);
-                }
-            });
-        });
-
-        // Funciones de control
-        function toggleDebug() {
-            isDebugMode = !isDebugMode;
-
-            if (isDebugMode) {
-                // Mostrar UI de depuración de AR.js
-                scene.setAttribute('arjs', 'debugUIEnabled: true');
-                debugInfo.textContent = 'Modo Debug Activado';
-                debugBtn.textContent = 'Ocultar Debug';
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                fullscreenBtn.textContent = "📱 Exit";
             } else {
-                // Ocultar UI de depuración
-                scene.setAttribute('arjs', 'debugUIEnabled: false');
-                debugInfo.textContent = 'Modo Debug Desactivado';
-                debugBtn.textContent = 'Mostrar Debug';
-
-                // Ocultar el texto de depuración
-                debugInfo.style.display = 'none';
+                document.exitFullscreen();
+                fullscreenBtn.textContent = "📱 Fullscreen";
             }
         }
 
-        // Asignar evento al botón de debug
-        debugBtn.addEventListener('click', toggleDebug);
+        function togglePlayPause() {
+            isPlaying = !isPlaying;
 
-        // Ajustes responsivos
-        window.addEventListener('resize', () => {
-            console.log('Pantalla redimensionada');
+            models.forEach(model => {
+                if (model.components['animation-mixer']) {
+                    if (isPlaying) {
+                        model.components['animation-mixer'].play();
+                    } else {
+                        model.components['animation-mixer'].pause();
+                    }
+                }
+            });
+
+            playPauseBtn.innerHTML = isPlaying ? '⏸️ Pause' : '▶️ Play';
+            debugInfo.textContent = isPlaying ? 'Animaciones activadas' : 'Animaciones pausadas';
+            debugInfo.style.backgroundColor = isPlaying ? 'rgba(0,255,0,0.7)' : 'rgba(255,165,0,0.7)';
+        }
+
+        models.forEach((model, index) => {
+            model.addEventListener('model-loaded', () => {
+                debugInfo.textContent = `Modelo ${index + 1} cargado. Sistema listo.`;
+            });
+        });
+
+        markers.forEach((marker, index) => {
+            marker.addEventListener('markerFound', () => {
+                activeMarkers.add(index);
+                debugInfo.textContent = `Marcador ${index + 1} activo ✓`;
+                debugInfo.style.backgroundColor = 'rgba(0,255,0,0.7)';
+
+                const model = models[index];
+                if (model.components['animation-mixer']) {
+                    if (isPlaying) {
+                        model.components['animation-mixer'].play();
+                    } else {
+                        model.components['animation-mixer'].pause();
+                    }
+                }
+            });
+
+            marker.addEventListener('markerLost', () => {
+                activeMarkers.delete(index);
+                debugInfo.textContent = `Marcador ${index + 1} perdido`;
+                debugInfo.style.backgroundColor = 'rgba(255,0,0,0.7)';
+            });
+        });
+
+        scene.addEventListener('loaded', () => {
+            loadingScreen.style.display = 'none';
+            debugInfo.textContent = 'AR listo. Apunta a un marcador.';
+        });
+
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+        playPauseBtn.addEventListener('click', togglePlayPause);
+
+        window.addEventListener('error', (error) => {
+            console.error('Error específico:', error);
+            debugInfo.textContent = 'Error: ' + error.message;
+            debugInfo.style.backgroundColor = 'rgba(255,0,0,0.7)';
         });
     </script>
 </body>
