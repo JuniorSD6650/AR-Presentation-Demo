@@ -102,8 +102,8 @@
     <div id="ar-overlay">
         <div id="debug-info">Estado: Iniciando sistema AR</div>
         <div id="controls">
-            <button class="ar-btn" id="playPauseBtn">⏸️ Pause</button>
-            <button class="ar-btn" id="fullscreenBtn">📱 Fullscreen</button>
+            <button class="ar-btn" id="playPauseBtn">⏸️ Pausar</button>
+            <button class="ar-btn" id="fullscreenBtn">📱 Pantalla Completa</button>
         </div>
     </div>
 
@@ -164,10 +164,10 @@
         function toggleFullscreen() {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen();
-                fullscreenBtn.textContent = "📱 Exit";
+                fullscreenBtn.textContent = "📱 Salir de pantalla completa";
             } else {
                 document.exitFullscreen();
-                fullscreenBtn.textContent = "📱 Fullscreen";
+                fullscreenBtn.textContent = "📱 Pantalla completa";
             }
         }
 
@@ -184,7 +184,7 @@
                 }
             });
 
-            playPauseBtn.innerHTML = isPlaying ? '⏸️ Pause' : '▶️ Play';
+            playPauseBtn.innerHTML = isPlaying ? '⏸️ Pausar' : '▶️ Reproducir';
             debugInfo.textContent = isPlaying ? 'Animaciones activadas' : 'Animaciones pausadas';
             debugInfo.style.backgroundColor = isPlaying ? 'rgba(0,255,0,0.7)' : 'rgba(255,165,0,0.7)';
         }
